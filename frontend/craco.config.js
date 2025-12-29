@@ -2,7 +2,10 @@
 
 module.exports = {
     // Override CRA webpack/babel configuration
-    webpack: {
+    webpack: {        
+        alias: {
+            "@": path.resolve(__dirname, "src"), 
+        },        
         configure: (webpackConfig) => {
             // Just return the default config for now
             return webpackConfig;
