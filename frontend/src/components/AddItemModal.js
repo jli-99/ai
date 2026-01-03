@@ -1,14 +1,20 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label
+} from "@/components";
+import { api } from "@/api"
 import Barcode from "react-barcode";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+//const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+//const API = `${BACKEND_URL}/api`;
 
 const AddItemModal = ({ open, onOpenChange, onItemAdded }) => {
   const [itemName, setItemName] = useState("");
