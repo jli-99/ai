@@ -1,10 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import "@/App.css";
+import { api } from "@/api";
 
 const Home = () => {
   const [items, setItems] = useState([]);
@@ -15,25 +12,41 @@ const Home = () => {
   /* ---------------- API calls ---------------- */
 
   const fetchItems = async () => {
-    const res = await axios.get(`${API}/items`);
-    setItems(res.data);
+    try {
+      const data = await api.getItems();
+      setItems(data);
+    } catch (err) {
+      console.error("Failed to fetch items", err);
+    }
   };
 
   const createItem = async () => {
     if (!newItemName.trim()) return;
-    await axios.post(`${API}/items`, { name: newItemName });
-    setNewItemName("");
-    fetchItems();
+    try {
+      await api.createItem(newItemName);
+      setNewItemName("");
+      fetchItems();
+    } catch (err) {
+      console.error("Failed to create item", err);
+    }
   };
 
   const checkIn = async (barcode) => {
-    await axios.post(`${API}/items/${barcode}/checkin`);
-    fetchItems();
+    try {
+      await api.checkIn(barcode);
+      fetchItems();
+    } catch (err) {
+      console.error("Check-in failed", err);
+    }
   };
 
   const checkOut = async (barcode) => {
-    await axios.post(`${API}/items/${barcode}/checkout`);
-    fetchItems();
+    try {
+      await api.checkOut(barcode);
+      fetchItems();
+    } catch (err) {
+      console.error("Check-out failed", err);
+    }
   };
 
   /* ---------------- Barcode scan flow ---------------- */
@@ -43,19 +56,21 @@ const Home = () => {
     if (!scanValue.trim()) return;
 
     try {
-      const itemRes = await axios.get(`${API}/items/${scanValue}`);
-      const item = itemRes.data;
+      const item = await api.getItem(scanValue);
 
       if (item.status === "in") {
-        await checkOut(scanValue);
+        await api.checkOut(scanValue);
       } else {
-        await checkIn(scanValue);
+        await api.checkIn(scanValue);
       }
+
+      fetchItems();
     } catch (err) {
       alert("Item not found for barcode: " + scanValue);
     }
 
     setScanValue("");
+    scanInputRef.current?.focus();
   };
 
   /* ---------------- Effects ---------------- */
@@ -68,22 +83,24 @@ const Home = () => {
   /* ---------------- UI ---------------- */
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, maxWidth: 900, margin: "0 auto" }}>
       <h2>📦 Inventory Manager</h2>
 
       {/* ---- Create Item ---- */}
-      <div style={{ marginBottom: 20 }}>
+      <section style={{ marginBottom: 24 }}>
         <h3>Create Item</h3>
-        <input
-          value={newItemName}
-          onChange={(e) => setNewItemName(e.target.value)}
-          placeholder="Item name"
-        />
-        <button onClick={createItem}>Create</button>
-      </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder="Item name"
+          />
+          <button onClick={createItem}>Create</button>
+        </div>
+      </section>
 
       {/* ---- Barcode Scan ---- */}
-      <div style={{ marginBottom: 20 }}>
+      <section style={{ marginBottom: 24 }}>
         <h3>Scan Barcode</h3>
         <form onSubmit={handleScanSubmit}>
           <input
@@ -92,34 +109,55 @@ const Home = () => {
             onChange={(e) => setScanValue(e.target.value)}
             placeholder="Scan barcode here"
           />
-          <button type="submit">Submit</button>
         </form>
         <p style={{ fontSize: 12 }}>
-          (Scanner will auto-submit with Enter)
+          Scanner will auto-submit when Enter is sent
         </p>
-      </div>
+      </section>
 
       {/* ---- Items List ---- */}
-      <h3>Items</h3>
-      <ul>
-        {items.map((item) => (
-          <li key={item.id} style={{ marginBottom: 8 }}>
-            <strong>{item.name}</strong>  
-            &nbsp;[{item.status}]  
-            &nbsp;({item.barcode})
+      <section>
+        <h3>Items</h3>
 
-            {item.status === "in" ? (
-              <button onClick={() => checkOut(item.barcode)}>
-                Check Out
-              </button>
-            ) : (
-              <button onClick={() => checkIn(item.barcode)}>
-                Check In
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+        {items.length === 0 ? (
+          <p>No items yet</p>
+        ) : (
+          <ul style={{ paddingLeft: 0 }}>
+            {items.map((item) => (
+              <li
+                key={item.id}
+                style={{
+                  listStyle: "none",
+                  border: "1px solid #ddd",
+                  padding: 12,
+                  marginBottom: 8,
+                  borderRadius: 6,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <strong>{item.name}</strong>
+                  <div style={{ fontSize: 12, color: "#555" }}>
+                    {item.barcode} · status: {item.status}
+                  </div>
+                </div>
+
+                {item.status === "in" ? (
+                  <button onClick={() => checkOut(item.barcode)}>
+                    Check Out
+                  </button>
+                ) : (
+                  <button onClick={() => checkIn(item.barcode)}>
+                    Check In
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 };
@@ -135,4 +173,3 @@ function App() {
 }
 
 export default App;
-
