@@ -1,49 +1,61 @@
 // src/api.js
 
 const BASE_URL = process.env.REACT_APP_BACKEND_URL;
+const API_PREFIX = "/api";
 
 if (!BASE_URL) {
-  console.warn("REACT_APP_BACKEND_URL is not set");
+  console.warn("⚠️ REACT_APP_BACKEND_URL is not set");
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+  let response;
+
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+      // credentials: "include", // enable later if needed
+      ...options,
+    });
+  } catch (err) {
+    throw new Error("Network error: backend is unreachable");
+  }
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`API error ${response.status}: ${text}`);
+    throw new Error(`API ${response.status}: ${text}`);
   }
 
-  // 204 No Content
   if (response.status === 204) return null;
 
-  return response.json();
+  const contentType = response.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.blob();
 }
 
-// ----------------------
-// API functions
-// ----------------------
+/* ----------------------
+   API methods
+---------------------- */
 
 export const api = {
   // GET /api/items
   getItems(search = "", status = "all") {
     const params = new URLSearchParams();
     if (search) params.append("search", search);
-    if (status && status !== "all") params.append("status", status);
+    if (status !== "all") params.append("status", status);
 
     const query = params.toString();
-    return request(`/api/items${query ? `?${query}` : ""}`);
+    return request(`${API_PREFIX}/items${query ? `?${query}` : ""}`);
   },
 
   // POST /api/items
   createItem(name) {
-    return request("/api/items", {
+    return request(`${API_PREFIX}/items`, {
       method: "POST",
       body: JSON.stringify({ name }),
     });
@@ -51,25 +63,26 @@ export const api = {
 
   // GET /api/items/{barcode}
   getItem(barcode) {
-    return request(`/api/items/${barcode}`);
+    return request(`${API_PREFIX}/items/${barcode}`);
   },
 
   // POST /api/items/{barcode}/checkin
   checkIn(barcode) {
-    return request(`/api/items/${barcode}/checkin`, {
+    return request(`${API_PREFIX}/items/${barcode}/checkin`, {
       method: "POST",
     });
   },
 
   // POST /api/items/{barcode}/checkout
   checkOut(barcode) {
-    return request(`/api/items/${barcode}/checkout`, {
+    return request(`${API_PREFIX}/items/${barcode}/checkout`, {
       method: "POST",
     });
   },
 
   // GET /api/items/{barcode}/barcode-image
   getBarcodeImage(barcode) {
-    return request(`/api/items/${barcode}/barcode-image`);
+    return request(`${API_PREFIX}/items/${barcode}/barcode-image`);
   },
 };
+
