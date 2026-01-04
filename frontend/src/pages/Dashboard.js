@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "sonner";
 import { Package, Scan, Plus, Search, Filter, ArrowDownLeft, ArrowUpRight, History } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Button,
+  Input,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui";
 import AddItemModal from "@/components/AddItemModal";
 import ScanModal from "@/components/ScanModal";
 import ItemDetails from "@/components/ItemDetails";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import { api } from "@/api"
 
 const Dashboard = () => {
   const [items, setItems] = useState([]);
@@ -33,9 +39,9 @@ const Dashboard = () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append("search", searchQuery);
       if (statusFilter !== "all") params.append("status", statusFilter);
-      
-      const response = await axios.get(`${API}/items?${params.toString()}`);
-      setItems(response.data);
+
+      const data = await api.getItems(searchQuery, statusFilter);
+      setItems(data);
     } catch (error) {
       toast.error("Failed to fetch items");
       console.error(error);
