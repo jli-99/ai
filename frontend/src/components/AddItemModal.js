@@ -9,7 +9,7 @@ import {
   DialogTitle,
   Input,
   Label
-} from "@/components";
+} from "@/components/ui";
 import { api } from "@/api"
 import Barcode from "react-barcode";
 

@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { ArrowDownLeft, ArrowUpRight, Package } from "lucide-react";
 import Barcode from "react-barcode";
 import axios from "axios";
@@ -17,10 +17,10 @@ const ItemDetails = ({ item, open, onOpenChange, onUpdate }) => {
       setLoading(true);
       const endpoint = action === "checkin" ? "checkin" : "checkout";
       await axios.post(`${API}/items/${item.barcode}/${endpoint}`);
-      
+
       const actionText = action === "checkin" ? "checked in" : "checked out";
       toast.success(`${item.name} ${actionText} successfully!`);
-      
+
       onUpdate();
       onOpenChange(false);
     } catch (error) {

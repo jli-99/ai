@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
+import { Label } from "@/components/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
 import { Camera, Keyboard, Scan } from "lucide-react";
 import Webcam from "react-webcam";
 
@@ -36,10 +36,10 @@ const ScanModal = ({ open, onOpenChange, action, onSuccess }) => {
       setLoading(true);
       const endpoint = action === "checkin" ? "checkin" : "checkout";
       const response = await axios.post(`${API}/items/${barcode}/${endpoint}`);
-      
+
       const actionText = action === "checkin" ? "checked in" : "checked out";
       toast.success(`${response.data.name} ${actionText} successfully!`);
-      
+
       onSuccess();
       handleClose();
     } catch (error) {
