@@ -123,3 +123,30 @@ export const TabsContent = ({ children, className = "" }) => (
         {children}
     </div>
 );
+
+/* ================= SELECT ================= */
+
+export const Select = ({ children }) => <div>{children}</div>;
+
+export const SelectTrigger = ({ children, className = "" }) => (
+    <div className={`border rounded-md px-3 py-2 cursor-pointer ${className}`}>
+        {children}
+    </div>
+);
+
+export const SelectValue = ({ placeholder }) => (
+    <span className="text-slate-500">{placeholder}</span>
+);
+
+export const SelectContent = ({ children }) => (
+    <div className="border rounded-md bg-white shadow mt-1">{children}</div>
+);
+
+export const SelectItem = ({ children, onClick }) => (
+    <div
+        onClick={onClick}
+        className="px-3 py-2 hover:bg-slate-100 cursor-pointer"
+    >
+        {children}
+    </div>
+);
