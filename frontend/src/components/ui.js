@@ -1,6 +1,8 @@
 import React from "react";
 
-/* ---------------- Button ---------------- */
+/* =========================================================
+   Button
+========================================================= */
 
 export const Button = ({
     children,
@@ -8,37 +10,46 @@ export const Button = ({
     ...props
 }) => (
     <button
-        className={`px-4 py-2 rounded-md text-sm font-medium transition 
-      bg-slate-900 text-white hover:bg-slate-800 
-      disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`px-4 py-2 rounded-md text-sm font-medium transition
+      bg-slate-900 text-white hover:bg-slate-800
+      disabled:opacity-50 disabled:cursor-not-allowed
+      active:scale-[0.98] ${className}`}
         {...props}
     >
         {children}
     </button>
 );
 
-/* ---------------- Input ---------------- */
+/* =========================================================
+   Input
+========================================================= */
 
-export const Input = (props) => (
+export const Input = ({ className = "", ...props }) => (
     <input
-        className="w-full h-10 px-3 rounded-md border border-slate-200 
-               focus:outline-none focus:ring-2 focus:ring-slate-400"
+        className={`w-full h-10 px-3 rounded-md border border-slate-200
+      text-sm
+      focus:outline-none focus:ring-2 focus:ring-slate-400
+      ${className}`}
         {...props}
     />
 );
 
-/* ---------------- Label ---------------- */
+/* =========================================================
+   Label
+========================================================= */
 
-export const Label = ({ children, ...props }) => (
+export const Label = ({ children, className = "", ...props }) => (
     <label
-        className="text-sm font-medium text-slate-700"
+        className={`text-sm font-medium text-slate-700 ${className}`}
         {...props}
     >
         {children}
     </label>
 );
 
-/* ---------------- Dialog ---------------- */
+/* =========================================================
+   Dialog (Modal)
+========================================================= */
 
 export const Dialog = ({ open, onOpenChange, children }) => {
     if (!open) return null;
@@ -63,12 +74,52 @@ export const DialogContent = ({ children, className = "" }) => (
     </div>
 );
 
-export const DialogHeader = ({ children }) => (
-    <div className="mb-4">{children}</div>
+export const DialogHeader = ({ children, className = "" }) => (
+    <div className={`mb-4 ${className}`}>
+        {children}
+    </div>
 );
 
-export const DialogTitle = ({ children }) => (
-    <h2 className="text-xl font-bold tracking-tight">
+export const DialogTitle = ({ children, className = "" }) => (
+    <h2 className={`text-xl font-bold tracking-tight ${className}`}>
         {children}
     </h2>
+);
+
+/* =========================================================
+   Tabs
+========================================================= */
+
+export const Tabs = ({ value, onValueChange, children }) => (
+    <div data-value={value}>{children}</div>
+);
+
+export const TabsList = ({ children, className = "" }) => (
+    <div
+        className={`inline-flex rounded-lg bg-slate-100 p-1 ${className}`}
+    >
+        {children}
+    </div>
+);
+
+export const TabsTrigger = ({
+    value,
+    children,
+    onClick,
+    className = "",
+}) => (
+    <button
+        onClick={onClick}
+        className={`px-3 py-1.5 text-sm rounded-md transition
+      text-slate-600 hover:text-slate-900 hover:bg-white
+      ${className}`}
+    >
+        {children}
+    </button>
+);
+
+export const TabsContent = ({ children, className = "" }) => (
+    <div className={`mt-4 ${className}`}>
+        {children}
+    </div>
 );
