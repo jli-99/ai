@@ -179,6 +179,14 @@ async def checkout_item(barcode_value: str):
     )
     return Item(**updated_item)
 
+@api_router.delete("/items/{barcode_value}", status_code=204)
+async def delete_item(barcode_value: str):
+    item = await db.items.find_one({"barcode": barcode_value})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    await db.items.delete_one({"barcode": barcode_value})
+    return
 
 @api_router.get("/items/{barcode_value}/barcode-image")
 async def get_barcode_image(barcode_value: str):
