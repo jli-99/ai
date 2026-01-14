@@ -80,6 +80,13 @@ export const api = {
     });
   },
 
+  // DELETE /api/items/{barcode}
+  deleteItem(barcode) {
+    return request(`${API_PREFIX}/items/${barcode}`, {
+      method: "DELETE",
+    });
+  },
+
   // GET /api/items/{barcode}/barcode-image
   getBarcodeImage(barcode) {
     return request(`${API_PREFIX}/items/${barcode}/barcode-image`);
