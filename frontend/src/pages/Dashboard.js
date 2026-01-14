@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Package, Scan, Plus, Search, Filter, ArrowDownLeft, ArrowUpRight, History } from "lucide-react";
+import { Package, Scan, Plus, Search, Filter, ArrowDownLeft, ArrowUpRight, History, Trash2 } from "lucide-react";
 // import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -21,6 +21,7 @@ import {
 import AddItemModal from "@/components/AddItemModal";
 import ScanModal from "@/components/ScanModal";
 import ItemDetails from "@/components/ItemDetails";
+import DeleteItemModal from "@/components/DeleteItemModal";
 
 import { api } from "@/api"
 
@@ -33,6 +34,8 @@ const Dashboard = () => {
   const [showScanModal, setShowScanModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [scanAction, setScanAction] = useState("checkout");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
 
   useEffect(() => {
     fetchItems();
@@ -102,6 +105,21 @@ const Dashboard = () => {
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Item
+              </Button>
+              <Button
+                data-testid="delete-item-btn"
+                onClick={() => {
+                  if (items.length === 0) {
+                    toast.error("No items available to delete");
+                    return;
+                  }
+                  setItemToDelete(items[0]); // default selection
+                  setShowDeleteModal(true);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition-all active:scale-95"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Item
               </Button>
             </div>
           </div>
@@ -224,6 +242,13 @@ const Dashboard = () => {
         open={showAddModal}
         onOpenChange={setShowAddModal}
         onItemAdded={fetchItems}
+      />
+
+      <DeleteItemModal
+        open={showDeleteModal}
+        item={itemToDelete}
+        onOpenChange={setShowDeleteModal}
+        onDeleted={fetchItems}
       />
 
       <ScanModal
