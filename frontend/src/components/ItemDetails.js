@@ -1,16 +1,113 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui";
 import { Button } from "@/components/ui";
-import { ArrowDownLeft, ArrowUpRight, Package } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Package, Printer } from "lucide-react";
 import Barcode from "react-barcode";
 import axios from "axios";
 import { toast } from "sonner";
 import { useState } from "react";
+import { api } from "@/api";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+export const buildBarcodePrintHtml = (item, imageSrc) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Print Barcode - ${item.name}</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            color: #111827;
+          }
+          .label {
+            width: 320px;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+          }
+          .name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            word-break: break-word;
+          }
+          img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 12px;
+          }
+          .barcode-text {
+            font-size: 14px;
+            font-family: monospace;
+            word-break: break-all;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+            .label {
+              border: none;
+              box-shadow: none;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="label">
+          <div class="name">${item.name}</div>
+          <img src="${imageSrc}" alt="Barcode for ${item.name}" />
+          <div class="barcode-text">${item.barcode}</div>
+        </div>
+        <script>
+          window.onload = function() {
+            setTimeout(() => window.print(), 250);
+          };
+        </script>
+      </body>
+    </html>
+  `;
+};
+
 const ItemDetails = ({ item, open, onOpenChange, onUpdate }) => {
   const [loading, setLoading] = useState(false);
+
+  const handlePrintBarcode = async () => {
+    try {
+      const response = await api.getBarcodeImage(item.barcode);
+      const imageSrc = response?.image;
+
+      if (!imageSrc) {
+        throw new Error("Barcode image not available");
+      }
+
+      const printWindow = window.open("", "_blank", "width=700,height=900");
+
+      if (!printWindow) {
+        toast.error("Please allow pop-ups to print the barcode.");
+        return;
+      }
+
+      printWindow.document.write(buildBarcodePrintHtml(item, imageSrc));
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 250);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate barcode for printing");
+    }
+  };
 
   const handleAction = async (action) => {
     try {
@@ -121,7 +218,7 @@ const ItemDetails = ({ item, open, onOpenChange, onUpdate }) => {
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-slate-200">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-200">
             {item.status === "in" ? (
               <Button
                 data-testid="checkout-from-details-btn"
@@ -143,6 +240,15 @@ const ItemDetails = ({ item, open, onOpenChange, onUpdate }) => {
                 Check In
               </Button>
             )}
+            <Button
+              data-testid="print-barcode-btn"
+              onClick={handlePrintBarcode}
+              variant="outline"
+              className="flex-1 border-slate-200 hover:bg-slate-50 rounded-lg h-10"
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Print Barcode
+            </Button>
             <Button
               data-testid="close-details-btn"
               onClick={() => onOpenChange(false)}
