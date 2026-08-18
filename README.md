@@ -1,99 +1,116 @@
-# ai
-simple examples for AI, ML, DL
+# AI / Inventory Project
+This repository contains two different kinds of work:
+
+- a full-stack inventory management application with a FastAPI backend and React frontend
+- a few standalone deep-learning / ML example scripts at the repository root
+
+## Project structure
+
+- `backend/` - FastAPI API and MongoDB integration
+- `backend/server.py` - main backend app and API routes
+- `backend/requirements.txt` - Python dependencies for the backend
+- `backend/.env` - local environment values for the backend
+- `frontend/` - frontend app configuration and source files
+- `frontend/.env` - frontend environment settings
+- `frontend/src/` - React app source code
+- `simple_dl.py` - PyTorch training example
+- `simple_dl_revision.py` - variant of the same example
+
+## What the app does
+
+The web app is an inventory tracker for managing items with:
+
+- item creation
+- search and filtering
+- status tracking (checked in / checked out)
+- barcode generation
+- item history
+- delete operations
+
+The backend exposes REST endpoints under `/api` and stores records in MongoDB.
+
+## Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- MongoDB running locally
+
+## Backend setup
+
+From the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+```
+
+The backend expects MongoDB connection information from environment variables. The repo already includes a local configuration in `backend/.env`:
+
+```env
+MONGO_URL="mongodb://localhost:27017"
+DB_NAME="test_database"
+CORS_ORIGINS="*"
+```
+
+Start MongoDB locally if it is not already running. Then start the API:
+
+```bash
+uvicorn backend.server:app --host 0.0.0.0 --port 8001 --reload
+```
+
+The backend will be available at:
+
+- http://localhost:8001
+
+## Frontend setup
+
+The frontend configuration is in the `frontend/` folder, and it expects the backend at `http://localhost:8001`.
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The frontend should launch in the browser on the default CRA development port, typically:
+
+- http://localhost:3000
+
+## Environment notes
+
+The frontend includes a local config in `frontend/.env`:
+
+```env
+REACT_APP_BACKEND_URL=http://localhost:8001
+WDS_SOCKET_PORT=443
+ENABLE_HEALTH_CHECK=false
+```
+
+If you change the backend port, update the frontend `.env` file as well.
+
+## Running the app together
+
+1. Start MongoDB
+2. Start the backend using `uvicorn backend.server:app --host 0.0.0.0 --port 8001 --reload`
+3. Start the frontend using `cd frontend && npm start`
+4. Open the frontend in the browser
+
+## Notes on the ML scripts
+
+The files `simple_dl.py` and `simple_dl_revision.py` are standalone examples and are not part of the web app runtime. They appear to be exploratory PyTorch experiments and may depend on local dataset paths or hardware-specific settings.
+
+## Troubleshooting
+
+- If the backend fails to start, verify that MongoDB is running and that `MONGO_URL` / `DB_NAME` are set.
+- If the frontend cannot reach the API, confirm `REACT_APP_BACKEND_URL` matches the backend URL.
+- If the app has port collisions, update the backend port and the frontend environment value together.
+
+## Summary
+
+This repo is best thought of as a small inventory management project with a FastAPI + MongoDB backend and a React dashboard, plus a few unrelated ML experiments stored alongside it.
 
 
-I understand you want to know how to deploy your inventory management app (FastAPI backend + React frontend + MongoDB) on your local Linux computer. Let me provide you with detailed deployment instructions.
- Summary: ## Local Deployment Guide for Inventory Management App
 
-**System Requirements:**
-- Linux operating system (Ubuntu 18.04+ recommended)
-- Minimum 4GB RAM, 10GB free disk space
-- Internet connection for downloading dependencies
 
-**Required Software/Dependencies:**
-1. **Python 3.8+**: `sudo apt update && sudo apt install python3 python3-pip python3-venv`
-2. **Node.js 16+**: `curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs`
-3. **MongoDB**: `wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add - && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list && sudo apt-get update && sudo apt-get install -y mongodb-org`
-4. **Git**: `sudo apt install git`
 
-**Step-by-Step Deployment Process:**
-
-**Backend Setup:**
-1. Navigate to your project directory: `cd /path/to/your/inventory-app`
-2. Create Python virtual environment: `python3 -m venv venv`
-3. Activate virtual environment: `source venv/bin/activate`
-4. Install Python dependencies: `pip install fastapi uvicorn pymongo python-barcode pillow`
-5. Start MongoDB service: `sudo systemctl start mongod && sudo systemctl enable mongod`
-6. Run FastAPI backend: `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
-
-**Frontend Setup:**
-1. Open new terminal, navigate to frontend directory: `cd /path/to/your/inventory-app/frontend`
-2. Install Node.js dependencies: `npm install`
-3. Install specific dependencies: `npm install react-barcode react-webcam`
-4. Start React development server: `npm start`
-
-**Running the Application:**
-- Backend will be available at: `http://localhost:8000`
-- Frontend will be available at: `http://localhost:3000`
-- MongoDB runs on default port: `27017`
-
-**Configuration Notes:**
-- Ensure MongoDB is running before starting the backend
-- Update API endpoints in React app to point to `http://localhost:8000`
-- Check firewall settings if accessing from other devices on network
-- For production deployment, use `npm run build` for React and configure reverse proxy
-
-**Troubleshooting:**
-- If MongoDB fails to start: `sudo systemctl status mongod` to check status
-- For permission issues: Ensure proper file ownership with `sudo chown -R $USER:$USER /path/to/project`
-- Port conflicts: Change ports in configuration if 3000/8000 are occupied
-
-Your inventory management app should now be running locally on your Linux system!
-Action: finish
-Observation: I understand you want to know how to deploy your inventory management app (FastAPI backend + React frontend + MongoDB) on your local Linux computer. Let me provide you with detailed deployment instructions.
- Summary: ## Local Deployment Guide for Inventory Management App
-
-**System Requirements:**
-- Linux operating system (Ubuntu 18.04+ recommended)
-- Minimum 4GB RAM, 10GB free disk space
-- Internet connection for downloading dependencies
-
-**Required Software/Dependencies:**
-1. **Python 3.8+**: `sudo apt update && sudo apt install python3 python3-pip python3-venv`
-2. **Node.js 16+**: `curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs`
-3. **MongoDB**: `wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add - && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list && sudo apt-get update && sudo apt-get install -y mongodb-org`
-4. **Git**: `sudo apt install git`
-
-**Step-by-Step Deployment Process:**
-
-**Backend Setup:**
-1. Navigate to your project directory: `cd /path/to/your/inventory-app`
-2. Create Python virtual environment: `python3 -m venv venv`
-3. Activate virtual environment: `source venv/bin/activate`
-4. Install Python dependencies: `pip install fastapi uvicorn pymongo python-barcode pillow`
-5. Start MongoDB service: `sudo systemctl start mongod && sudo systemctl enable mongod`
-6. Run FastAPI backend: `uvicorn main:app --host 0.0.0.0 --port 8000 --reload`
-
-**Frontend Setup:**
-1. Open new terminal, navigate to frontend directory: `cd /path/to/your/inventory-app/frontend`
-2. Install Node.js dependencies: `npm install`
-3. Install specific dependencies: `npm install react-barcode react-webcam`
-4. Start React development server: `npm start`
-
-**Running the Application:**
-- Backend will be available at: `http://localhost:8000`
-- Frontend will be available at: `http://localhost:3000`
-- MongoDB runs on default port: `27017`
-
-**Configuration Notes:**
-- Ensure MongoDB is running before starting the backend
-- Update API endpoints in React app to point to `http://localhost:8000`
-- Check firewall settings if accessing from other devices on network
-- For production deployment, use `npm run build` for React and configure reverse proxy
-
-**Troubleshooting:**
-- If MongoDB fails to start: `sudo systemctl status mongod` to check status
-- For permission issues: Ensure proper file ownership with `sudo chown -R $USER:$USER /path/to/project`
-- Port conflicts: Change ports in configuration if 3000/8000 are occupied
-
-Your inventory management app should now be running locally on your Linux system!
